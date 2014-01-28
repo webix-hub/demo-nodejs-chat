@@ -1,0 +1,93 @@
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="http://cdn.webix.io/edge/webix.js"></script>
+	<link rel="stylesheet" type="text/css" href="http://cdn.webix.io/edge/webix.css">
+
+	<script type="text/javascript" src="//localhost:3000/faye/client.js"></script>
+</head>
+<body>
+<style type="text/css">
+	.webix_list_item span{
+		font-weight: bold;
+		min-width: 100px;
+		float: left;
+		text-align: center;
+	}
+	.webix_list_item span.own{
+		color:#4a4;
+	}
+</style>
+<script type="text/javascript">
+	webix.proxy.faye.client = new Faye.Client('//localhost:3000/faye/');
+	webix.proxy.faye.clientId = webix.uid();
+
+	var user_name = "Guest " + Math.ceil(Math.random()*9999);
+
+	function send_message(){
+		var text = $$("message").getValue();
+
+		if (text){
+			if (text.indexOf("/nick ") == 0){
+				var old_name = user_name;
+				user_name = text.substr(6);
+				$$("chat").add({
+					user:  "System",
+					value: old_name +" is now known as "+user_name
+				});
+			} else
+				$$("chat").add({
+					user:  user_name,
+					value: text
+				});
+		}
+
+
+		$$("message").setValue("");
+		$$("message").focus();
+	}
+	function chat_template(obj){
+		return "<span "+(obj.user == user_name ? "class='own'" : "" )+">"+obj.user+"</span> "+obj.value;
+	}
+
+
+
+	webix.ui({ 
+		rows:[
+			{ template:"Webix Based Chat", type:"header" },
+			{
+				view: "list", id:"chat", gravity:3,
+				url:  "faye->/data", save: "faye->/data",
+				type:{ height:"auto" },
+				template:chat_template
+			},
+			{ cols: [
+				{ view:"text", id:"message", placeholder:"Type message here", gravity: 3},
+				{ view:"button", value: "Send", click:send_message }
+			]}
+		], type:"space", margin:2
+	});
+
+	//add default text to the chat
+	webix.dp($$("chat")).ignore(function(){
+		$$("chat").add({
+			user:"System", value:"Welcome to chat :)"
+		});
+		$$("chat").add({
+			user:"System", value:"Uset '/nick Name' to set a name"
+		});
+	});
+	//adjust scroll to show new message
+	$$("chat").attachEvent("onAfterAdd", function(id){
+		webix.delay(function(){
+			this.showItem(id);
+		}, this);
+	})
+
+	//add hotkeys to the message area
+	webix.UIManager.addHotKey("Enter", send_message, $$("message"));
+	webix.UIManager.setFocus($$("message"));
+</script>
+
+</body>
+</html>

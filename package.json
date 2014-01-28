@@ -1,0 +1,18 @@
+{
+  "name": "demo-nodejs-chat",
+  "version": "0.1.0",
+  "description": "Sample of sockets usage with Webix UI",
+  "main": "server.js",
+  "dependencies": {
+    "faye": "~1.0.1",
+    "connect": "~2.12.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": "",
+  "author": "",
+  "license": "GPL"
+}
